@@ -96,8 +96,12 @@ npm run dev
 2. Type what you want to build (title + optional details)
 3. Click **Generate Prototype** — takes ~15–30 seconds
 4. Click **Open prototype →** to view it in a new tab (only you can access it)
-5. Click **Update** on any prototype to iterate with a follow-up request
-6. Click **Delete** to remove it permanently
+5. Click **Edit** on any prototype to open the AI chat sidebar editor:
+   - Live preview on the left (updates instantly — no page reload)
+   - Describe any change in the chat on the right (e.g. "add dark mode", "change the table to show 10 rows")
+   - Click **Save changes** when you're happy — persists to storage
+6. Click **Regenerate** to re-run the original AI generation with a new request
+7. Click **Delete** to remove it permanently
 
 ---
 
@@ -147,24 +151,28 @@ Enable Google, Twitter, etc. in Supabase → Authentication → Providers. Add a
 ```
 prototype-agent/
 ├── app/
-│   ├── page.tsx                    # Landing / login
-│   ├── dashboard/page.tsx          # Main portal (auth-gated)
-│   ├── prototype/[id]/route.ts     # Serves HTML (auth-gated, owner only)
-│   ├── auth/callback/route.ts      # OAuth callback
+│   ├── page.tsx                        # Landing / login
+│   ├── dashboard/page.tsx              # Main portal (auth-gated)
+│   ├── prototype/[id]/route.ts         # Serves HTML (auth-gated, owner only)
+│   ├── prototype/[id]/edit/page.tsx    # AI chat sidebar editor
+│   ├── auth/callback/route.ts          # OAuth callback
 │   └── api/
-│       ├── generate/route.ts       # POST: new prototype
-│       ├── update/route.ts         # POST: update existing
-│       └── delete/[id]/route.ts    # DELETE: remove
+│       ├── generate/route.ts           # POST: new prototype
+│       ├── update/route.ts             # POST: regenerate existing
+│       ├── patch/route.ts              # POST: AI chat edit (returns new HTML)
+│       ├── save/route.ts               # POST: persist edited HTML to storage
+│       └── delete/[id]/route.ts        # DELETE: remove
 ├── components/
-│   ├── Dashboard.tsx               # Main UI (client component)
+│   ├── Dashboard.tsx                   # Main UI (client component)
+│   ├── Editor.tsx                      # Split-pane AI editor (client component)
 │   └── LoginButton.tsx
 ├── lib/
-│   ├── supabase/server.ts          # Server-side Supabase client
-│   ├── supabase/client.ts          # Browser Supabase client
-│   ├── gemini.ts                   # Gemini generation logic
+│   ├── supabase/server.ts              # Server-side Supabase client
+│   ├── supabase/client.ts              # Browser Supabase client
+│   ├── gemini.ts                       # Gemini generation + patch logic
 │   └── types.ts
-├── middleware.ts                   # Auth protection on all routes
-├── supabase/schema.sql             # DB + storage RLS (run once)
+├── middleware.ts                       # Auth protection on all routes
+├── supabase/schema.sql                 # DB + storage RLS (run once)
 └── .env.example
 ```
 
