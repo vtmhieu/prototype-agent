@@ -90,6 +90,15 @@ npm run dev
 
 ---
 
+## Design
+
+- **Landing page** — dark hero with violet gradient glow, large headline, fake demo window, 3-column feature grid
+- **Dashboard** — white cards with per-prototype colour avatars, violet accent, sticky header, rich empty state
+- **Editor** — split-pane with live iframe, AI chat sidebar, collapsible on mobile
+- **Font** — Inter via `next/font/google`
+
+---
+
 ## Usage
 
 1. Visit your app URL → **Continue with GitHub**
