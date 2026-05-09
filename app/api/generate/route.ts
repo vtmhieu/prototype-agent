@@ -25,7 +25,8 @@ export async function POST(request: Request) {
     ;({ plan, html } = await generatePrototype(title, description ?? ''))
   } catch (e) {
     console.error('Gemini error:', e)
-    return NextResponse.json({ error: 'Generation failed' }, { status: 500 })
+    const msg = e instanceof Error ? e.message : 'Generation failed'
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 
   const prototypeId = crypto.randomUUID()
@@ -51,6 +52,8 @@ export async function POST(request: Request) {
 
   if (dbError) {
     console.error('DB error:', dbError)
+    // Clean up the uploaded file so we don't leave orphans in storage
+    await supabase.storage.from('prototypes').remove([storagePath])
     return NextResponse.json({ error: 'Failed to save metadata' }, { status: 500 })
   }
 

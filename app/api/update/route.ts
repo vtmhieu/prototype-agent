@@ -40,7 +40,8 @@ export async function POST(request: Request) {
     ))
   } catch (e) {
     console.error('Gemini error:', e)
-    return NextResponse.json({ error: 'Generation failed' }, { status: 500 })
+    const msg = e instanceof Error ? e.message : 'Generation failed'
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 
   // Overwrite the existing file in storage

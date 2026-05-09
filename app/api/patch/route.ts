@@ -34,6 +34,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ html, summary })
   } catch (e) {
     console.error('Gemini patch error:', e)
-    return NextResponse.json({ error: 'Patch failed' }, { status: 500 })
+    const msg = e instanceof Error ? e.message : 'Patch failed'
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 }

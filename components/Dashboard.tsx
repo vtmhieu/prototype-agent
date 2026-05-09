@@ -27,6 +27,7 @@ export default function Dashboard({ userEmail }: { userEmail: string }) {
   // list
   const [prototypes, setPrototypes] = useState<Prototype[]>([])
   const [loadingList, setLoadingList] = useState(true)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
 
   const loadPrototypes = useCallback(async () => {
     const { data } = await supabase
@@ -122,6 +123,13 @@ export default function Dashboard({ userEmail }: { userEmail: string }) {
     } finally {
       setStatus('idle')
     }
+  }
+
+  async function copyLink(id: string) {
+    const url = `${window.location.origin}/prototype/${id}`
+    await navigator.clipboard.writeText(url)
+    setCopiedId(id)
+    setTimeout(() => setCopiedId(null), 2000)
   }
 
   function reset() {
@@ -273,6 +281,13 @@ export default function Dashboard({ userEmail }: { userEmail: string }) {
                       >
                         Open
                       </a>
+                      <span className="text-gray-200">|</span>
+                      <button
+                        onClick={() => copyLink(p.id)}
+                        className="text-xs text-gray-500 hover:text-gray-800"
+                      >
+                        {copiedId === p.id ? 'Copied!' : 'Copy link'}
+                      </button>
                       <span className="text-gray-200">|</span>
                       <a
                         href={`/prototype/${p.id}/edit`}
