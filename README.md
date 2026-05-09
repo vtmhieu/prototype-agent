@@ -37,9 +37,14 @@ GET /prototype/[id]
 3. Go to **Storage → New bucket**:
    - Name: `prototypes`
    - Public: **off** (private)
-4. Go to **Project Settings → API** and copy:
-   - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
-   - Anon public key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+4. Find your keys — go to **Project Settings → API**:
+
+   ![Supabase API settings](https://i.imgur.com/placeholder.png)
+
+   | What you need | Where to find it |
+   |---|---|
+   | `NEXT_PUBLIC_SUPABASE_URL` | **Project URL** field |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **Project API keys → anon public** field |
 
 ### 2. GitHub OAuth app
 
@@ -50,34 +55,35 @@ GET /prototype/[id]
    - **Authorization callback URL:** `https://your-app.vercel.app/auth/callback`
 3. Copy the **Client ID** and generate a **Client Secret**
 4. In Supabase → **Authentication → Providers → GitHub** → enable it, paste Client ID and Secret
+5. In Supabase → **Authentication → URL Configuration** → add `https://your-app.vercel.app/auth/callback` to **Redirect URLs**
 
 ### 3. Gemini API key
 
-1. Go to **aistudio.google.com** → Get API key → Create API key in new project
+1. Go to **aistudio.google.com** → Get API key → **Create API key in new project**
 2. No credit card needed — free tier
 
-### 4. Deploy to Vercel
+### 4. Add environment variables to Vercel
 
-1. Push this repo to GitHub
-2. Go to **vercel.com → New Project** → import the repo
-3. Add these environment variables:
+> ⚠️ This is the most important step. If these are missing or wrong, the app won't work.
 
-| Variable | Value |
-|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | From Supabase project settings |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | From Supabase project settings |
-| `GEMINI_API_KEY` | From Google AI Studio |
-| `GEMINI_MODEL` | `gemini-2.0-flash-lite` (or leave unset) |
+Go to **vercel.com → your project → Settings → Environment Variables** and add all four:
 
-4. Deploy — Vercel gives you a URL like `your-app.vercel.app`
-5. Go back to your GitHub OAuth App settings and update the homepage + callback URLs with your real Vercel URL
-6. Go back to Supabase → **Authentication → URL Configuration** → add `https://your-app.vercel.app/auth/callback` to **Redirect URLs**
+| Variable | Where to get it | Example value |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API → Project URL | `https://xxxx.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → API → anon public | `eyJhbGci...` (long string) |
+| `GEMINI_API_KEY` | aistudio.google.com → Get API key | `AIzaSy...` |
+| `GEMINI_MODEL` | Type it manually | `gemini-2.0-flash-lite` |
+
+After adding all variables, **redeploy** — Vercel must rebuild for `NEXT_PUBLIC_` variables to take effect:
+- Go to **Deployments → latest deployment → ⋯ → Redeploy**
+- Or push any commit to trigger a new build
 
 ### 5. Local development
 
 ```bash
 cp .env.example .env.local
-# Fill in the values
+# Fill in the values (same 4 variables as above)
 npm install
 npm run dev
 ```
@@ -105,11 +111,24 @@ npm run dev
 
 ---
 
+## Troubleshooting
+
+**"No API key found in request"**
+→ `NEXT_PUBLIC_SUPABASE_ANON_KEY` is missing or the app hasn't been redeployed since you added it. Redeploy from the Vercel dashboard.
+
+**"Invalid login credentials" / OAuth not working**
+→ Check that the callback URL in your GitHub OAuth App matches exactly: `https://your-app.vercel.app/auth/callback`. Also check Supabase → Authentication → URL Configuration has the same URL in Redirect URLs.
+
+**Build fails**
+→ Check Vercel → Deployments → the failed build → Build Logs for the specific error.
+
+---
+
 ## Customize
 
 ### Use a smarter model
 
-Change `GEMINI_MODEL` in your Vercel environment variables:
+Change `GEMINI_MODEL` in Vercel → Settings → Environment Variables:
 - `gemini-2.0-flash` — better quality, still free
 - `gemini-1.5-pro` — best quality, may need paid tier at volume
 
