@@ -99,9 +99,13 @@ npm run dev
 5. Click **Edit** on any prototype to open the AI chat sidebar editor:
    - Live preview on the left (updates instantly — no page reload)
    - Describe any change in the chat on the right (e.g. "add dark mode", "change the table to show 10 rows")
-   - Click **Save changes** when you're happy — persists to storage
-6. Click **Regenerate** to re-run the original AI generation with a new request
-7. Click **Delete** to remove it permanently
+   - Changes **auto-save 3 seconds** after each patch — no manual save needed
+   - Browser warns you before closing if there are unsaved changes
+   - **Download** button exports the HTML file locally
+   - On mobile, the sidebar collapses — tap the chat icon to toggle it
+6. Click **Copy link** to copy the prototype URL to your clipboard
+7. Click **Regenerate** to re-run the original AI generation with a new request
+8. Click **Delete** to remove it permanently
 
 ---
 
@@ -122,6 +126,9 @@ npm run dev
 
 **"Invalid login credentials" / OAuth not working**
 → Check that the callback URL in your GitHub OAuth App matches exactly: `https://your-app.vercel.app/auth/callback`. Also check Supabase → Authentication → URL Configuration has the same URL in Redirect URLs.
+
+**Generation/patch shows a specific error message**
+→ The app now surfaces the real Gemini error. Common causes: quota exceeded on the free tier (wait a minute), or model not available in your region.
 
 **Build fails**
 → Check Vercel → Deployments → the failed build → Build Logs for the specific error.
