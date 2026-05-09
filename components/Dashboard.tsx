@@ -142,89 +142,98 @@ export default function Dashboard({ userEmail }: { userEmail: string }) {
   const busy = status !== 'idle'
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <span className="font-semibold text-gray-900">Prototype Agent</span>
+      <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
+        <div className="max-w-3xl mx-auto px-4 py-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded-md bg-violet-600 flex items-center justify-center text-xs font-bold text-white">P</span>
+            <span className="font-semibold text-gray-900 text-sm">Prototype Agent</span>
+          </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-400">{userEmail}</span>
-            <button onClick={signOut} className="text-sm text-gray-500 hover:text-gray-800">
+            <span className="text-xs text-gray-400 hidden sm:block">{userEmail}</span>
+            <button onClick={signOut} className="text-xs text-gray-500 hover:text-gray-800 transition-colors">
               Sign out
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto px-4 py-10">
+      <div className="max-w-3xl mx-auto px-4 py-10">
+
+        {/* Hero text */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">What do you want to build?</h1>
+          <p className="text-sm text-gray-500">Describe a UI — get a live, interactive prototype in ~30 seconds.</p>
+        </div>
 
         {/* Generate form */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <h2 className="text-sm font-semibold text-gray-700 mb-4">New prototype</h2>
-          <div className="mb-4">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
+          <div className="mb-3">
             <input
               type="text"
               value={title}
               onChange={e => setTitle(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && !description && handleGenerate()}
               disabled={busy}
-              placeholder="What do you want to build? e.g. CRM dashboard for sales leads"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-400"
+              placeholder="e.g. CRM dashboard for sales leads"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-400 transition"
             />
           </div>
-          <div className="mb-5">
+          <div className="mb-4">
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
               disabled={busy}
               rows={3}
               placeholder="Details (optional) — features, layout, data to show, interactions..."
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 resize-none disabled:bg-gray-50 disabled:text-gray-400"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none disabled:bg-gray-50 disabled:text-gray-400 transition"
             />
           </div>
           <button
             onClick={handleGenerate}
             disabled={!title.trim() || busy}
-            className="w-full py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="w-full py-3 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm shadow-violet-200"
           >
-            Generate Prototype
+            {busy && status === 'generating' ? (
+              <span className="flex items-center justify-center gap-2">
+                <Spinner /> Generating…
+              </span>
+            ) : 'Generate Prototype'}
           </button>
         </div>
 
         {/* Status */}
         {status !== 'idle' && (
           <div className="mb-6">
-            {(status === 'generating' || status === 'updating') && (
-              <div className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-600">
+            {status === 'updating' && (
+              <div className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm text-gray-600 shadow-sm">
                 <Spinner />
-                <span>
-                  {status === 'generating' ? 'Generating prototype' : 'Updating prototype'}
-                  <span className="text-gray-400 ml-2">{elapsed}s</span>
-                </span>
+                <span>Regenerating prototype <span className="text-gray-400 ml-1">{elapsed}s</span></span>
               </div>
             )}
 
             {status === 'deleting' && (
-              <div className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-600">
-                <Spinner />
-                Deleting...
+              <div className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm text-gray-600 shadow-sm">
+                <Spinner /> Deleting…
               </div>
             )}
 
             {status === 'done' && (
-              <div className="bg-green-50 border border-green-200 rounded-xl p-5">
-                <p className="text-green-800 font-medium mb-1">
+              <div className="bg-green-50 border border-green-200 rounded-2xl p-5 shadow-sm">
+                <p className="text-green-800 font-semibold mb-1 text-sm">
                   {lastId ? '✅ Ready' : '✅ Done'}
+                  {elapsed > 0 && <span className="font-normal text-green-600 ml-2 text-xs">in {elapsed}s</span>}
                 </p>
                 {lastPlan && (
-                  <pre className="text-xs text-green-700 whitespace-pre-wrap mb-3 font-sans">{lastPlan}</pre>
+                  <pre className="text-xs text-green-700 whitespace-pre-wrap mb-3 font-sans leading-relaxed">{lastPlan}</pre>
                 )}
                 <div className="flex items-center gap-3">
                   {lastId && (
                     <a
                       href={`/prototype/${lastId}`}
                       target="_blank"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-800"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-800 transition-colors"
                     >
                       Open prototype →
                     </a>
@@ -237,9 +246,9 @@ export default function Dashboard({ userEmail }: { userEmail: string }) {
             )}
 
             {status === 'error' && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-5">
-                <p className="text-red-800 font-medium mb-1">❌ Failed</p>
-                <p className="text-red-700 text-sm mb-3">{errorMsg}</p>
+              <div className="bg-red-50 border border-red-200 rounded-2xl p-5 shadow-sm">
+                <p className="text-red-800 font-semibold mb-1 text-sm">Generation failed</p>
+                <p className="text-red-600 text-xs mb-3 font-mono">{errorMsg}</p>
                 <button onClick={reset} className="text-sm text-red-700 hover:underline">
                   Try again
                 </button>
@@ -250,91 +259,97 @@ export default function Dashboard({ userEmail }: { userEmail: string }) {
 
         {/* Prototype list */}
         {loadingList ? (
-          <div className="text-sm text-gray-400 text-center py-8">Loading...</div>
-        ) : prototypes.length === 0 ? (
-          <div className="text-sm text-gray-400 text-center py-8">
-            No prototypes yet. Generate your first one above.
+          <div className="flex items-center justify-center py-16 gap-2 text-sm text-gray-400">
+            <Spinner /> Loading…
           </div>
+        ) : prototypes.length === 0 ? (
+          <EmptyState />
         ) : (
           <div>
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
-              Your prototypes
+              Your prototypes ({prototypes.length})
             </h2>
-            <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+            <div className="space-y-2">
               {prototypes.map(p => (
-                <div key={p.id}>
+                <div key={p.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                   {/* Row */}
-                  <div className="flex items-center gap-3 px-5 py-3.5">
+                  <div className="flex items-center gap-4 px-5 py-4">
+                    {/* Colour swatch derived from id */}
+                    <div
+                      className="w-9 h-9 rounded-lg shrink-0 flex items-center justify-center text-white text-xs font-bold"
+                      style={{ background: idToGradient(p.id) }}
+                    >
+                      {p.title.slice(0, 1).toUpperCase()}
+                    </div>
+
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-800 truncate">{p.title}</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">{p.title}</p>
                       <p className="text-xs text-gray-400 mt-0.5">
-                        {new Date(p.updated_at).toLocaleDateString('en-US', {
+                        Updated {new Date(p.updated_at).toLocaleDateString('en-US', {
                           month: 'short', day: 'numeric', year: 'numeric'
                         })}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
+
+                    <div className="flex items-center gap-1 shrink-0">
                       <a
                         href={`/prototype/${p.id}`}
                         target="_blank"
-                        className="text-xs text-blue-600 hover:underline"
+                        className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-violet-700 bg-violet-50 hover:bg-violet-100 transition-colors"
                       >
                         Open
                       </a>
-                      <span className="text-gray-200">|</span>
-                      <button
-                        onClick={() => copyLink(p.id)}
-                        className="text-xs text-gray-500 hover:text-gray-800"
-                      >
-                        {copiedId === p.id ? 'Copied!' : 'Copy link'}
-                      </button>
-                      <span className="text-gray-200">|</span>
                       <a
                         href={`/prototype/${p.id}/edit`}
-                        className="text-xs text-gray-500 hover:text-gray-800"
+                        className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                       >
                         Edit
                       </a>
-                      <span className="text-gray-200">|</span>
+                      <button
+                        onClick={() => copyLink(p.id)}
+                        className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+                      >
+                        {copiedId === p.id ? '✓ Copied' : 'Copy link'}
+                      </button>
                       <button
                         onClick={() => { setUpdatingId(updatingId === p.id ? null : p.id); setUpdateRequest('') }}
                         disabled={busy}
-                        className="text-xs text-gray-500 hover:text-gray-800 disabled:opacity-30"
+                        className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-30"
                       >
                         Regenerate
                       </button>
-                      <span className="text-gray-200">|</span>
                       <button
                         onClick={() => handleDelete(p.id)}
                         disabled={busy}
-                        className="text-xs text-red-400 hover:text-red-600 disabled:opacity-30"
+                        className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-30"
                       >
                         Delete
                       </button>
                     </div>
                   </div>
 
-                  {/* Inline update form */}
+                  {/* Inline regenerate form */}
                   {updatingId === p.id && status === 'idle' && (
-                    <div className="px-5 pb-4 pt-2 border-t border-gray-100 bg-gray-50">
+                    <div className="px-5 pb-4 pt-3 border-t border-gray-100 bg-gray-50">
                       <textarea
                         value={updateRequest}
                         onChange={e => setUpdateRequest(e.target.value)}
                         rows={2}
                         placeholder="What do you want to change? e.g. Add dark mode, change colours to blue, add an export button..."
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 resize-none bg-white mb-2"
+                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none bg-white mb-2 transition"
+                        autoFocus
                       />
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleUpdate(p.id)}
                           disabled={!updateRequest.trim()}
-                          className="px-4 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="px-4 py-1.5 bg-violet-600 text-white text-xs font-semibold rounded-lg hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         >
-                          Apply update
+                          Regenerate
                         </button>
                         <button
                           onClick={() => { setUpdatingId(null); setUpdateRequest('') }}
-                          className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-800"
+                          className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-800 transition-colors"
                         >
                           Cancel
                         </button>
@@ -351,11 +366,44 @@ export default function Dashboard({ userEmail }: { userEmail: string }) {
   )
 }
 
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
 function Spinner() {
   return (
-    <svg className="animate-spin h-4 w-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24">
+    <svg className="animate-spin h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
     </svg>
   )
+}
+
+function EmptyState() {
+  return (
+    <div className="text-center py-20">
+      <div className="w-16 h-16 rounded-2xl bg-violet-50 border border-violet-100 flex items-center justify-center mx-auto mb-5">
+        <svg className="w-8 h-8 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <p className="text-gray-800 font-semibold mb-1">No prototypes yet</p>
+      <p className="text-sm text-gray-400">Type a requirement above and hit Generate.</p>
+    </div>
+  )
+}
+
+// Deterministic gradient from a UUID — picks from a palette based on first char
+function idToGradient(id: string) {
+  const palettes = [
+    'linear-gradient(135deg, #7c3aed, #a855f7)',
+    'linear-gradient(135deg, #2563eb, #60a5fa)',
+    'linear-gradient(135deg, #059669, #34d399)',
+    'linear-gradient(135deg, #d97706, #fbbf24)',
+    'linear-gradient(135deg, #db2777, #f472b6)',
+    'linear-gradient(135deg, #0891b2, #22d3ee)',
+    'linear-gradient(135deg, #7c3aed, #2563eb)',
+    'linear-gradient(135deg, #dc2626, #f97316)',
+  ]
+  const idx = parseInt(id[0], 16) % palettes.length
+  return palettes[idx]
 }
