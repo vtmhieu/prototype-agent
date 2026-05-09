@@ -59,3 +59,32 @@ export async function generatePrototype(
 
   return { plan, html }
 }
+
+export async function patchPrototype(
+  currentHtml: string,
+  userRequest: string
+): Promise<{ html: string; summary: string }> {
+  const model = genai.getGenerativeModel({
+    model: MODEL,
+    systemInstruction: `You are editing an existing single-file HTML prototype.
+Apply the user's requested change precisely and return the complete updated HTML file.
+Rules:
+- Return ONLY the raw HTML — no markdown, no code fences, no explanation.
+- The file must start with <!DOCTYPE html> and be fully self-contained.
+- Only change what was asked. Do not redesign or restructure unrelated parts.
+- After the HTML, add exactly one line starting with SUMMARY: describing what you changed in plain English (max 12 words).`,
+  })
+
+  const prompt = `Current HTML:\n${currentHtml}\n\nRequested change: ${userRequest}`
+
+  const result = await model.generateContent(prompt)
+  const text = result.response.text().trim()
+
+  // Split off the SUMMARY line
+  const summaryMatch = text.match(/SUMMARY:\s*(.+)$/m)
+  const summary = summaryMatch?.[1].trim() ?? 'Change applied.'
+  const html = text.replace(/\nSUMMARY:.*$/m, '').trim()
+    .replace(/^```html\n?/, '').replace(/\n?```$/, '').trim()
+
+  return { html, summary }
+}

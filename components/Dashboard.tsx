@@ -274,12 +274,19 @@ export default function Dashboard({ userEmail }: { userEmail: string }) {
                         Open
                       </a>
                       <span className="text-gray-200">|</span>
+                      <a
+                        href={`/prototype/${p.id}/edit`}
+                        className="text-xs text-gray-500 hover:text-gray-800"
+                      >
+                        Edit
+                      </a>
+                      <span className="text-gray-200">|</span>
                       <button
                         onClick={() => { setUpdatingId(updatingId === p.id ? null : p.id); setUpdateRequest('') }}
                         disabled={busy}
                         className="text-xs text-gray-500 hover:text-gray-800 disabled:opacity-30"
                       >
-                        Update
+                        Regenerate
                       </button>
                       <span className="text-gray-200">|</span>
                       <button
